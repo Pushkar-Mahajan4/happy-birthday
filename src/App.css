@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  overflow: hidden; /* Prevent scrolling */
+  background-color: pink; /* Set the background color */
+}
+
+.App {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Keep hearts inside the screen */
+}
+
+.heart {
+  position: absolute;
+  bottom: 0;
+  background: url("/public/heart.png") no-repeat center/contain;
+  background-size: 100%;
+  pointer-events: none; /* Prevent interaction */
+}
