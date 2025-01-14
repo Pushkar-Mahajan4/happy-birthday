@@ -4,30 +4,45 @@ import './App.css';
 
 const App = () => {
   const [hearts, setHearts] = useState([]);
+  const heartCount = 4; // Number of hearts to spawn
+  const spawnInterval = 2000; // Spawn rate in milliseconds
 
   useEffect(() => {
-    
-    setHearts([
-      {
-        id: Math.random(), // Generate random ID
-        left: Math.random() * 100, // Random starting position
-        size: Math.random() * 20 + 20, // Random size
-      },
-    ]);
+    // Create and add initial hearts one by one with a delay
+    let initialHeartCount = 0;
+    const initialHeartInterval = setInterval(() => {
+      if (initialHeartCount < heartCount) {
+        setHearts(prevHearts => [...prevHearts, {
+          id: Math.random(),
+          left: Math.random() * 100,
+          size: Math.random() * 20 + 20,
+          startY: 60 + (initialHeartCount * 10), // Space hearts vertically from 60vh
+          isInitial: true,
+        }]);
+        initialHeartCount++;
+      } else {
+        clearInterval(initialHeartInterval);
+      }
+    }, 500); // Add a new initial heart every 500ms
 
-    const interval = setInterval(() => {
+    // Start regular heart spawning after initial hearts are created
+    const regularSpawnInterval = setInterval(() => {
       setHearts((prevHearts) => [
         ...prevHearts,
         {
           id: Date.now(),
-          left: Math.random() * 100, // Random starting position (percentage of screen width)
-          size: Math.random() * 20 + 20, // Random size between 20px and 40px
+          left: Math.random() * 100,
+          size: Math.random() * 20 + 20,
+          isInitial: false,
         },
       ]);
-    }, 2000);
+    }, spawnInterval);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => {
+      clearInterval(initialHeartInterval);
+      clearInterval(regularSpawnInterval);
+    };
+  }, []); // Only run on mount since values are constant
 
   return (
     <div className="App">
@@ -36,6 +51,8 @@ const App = () => {
           key={heart.id}
           left={heart.left}
           size={heart.size}
+          isInitial={heart.isInitial}
+          startY={heart.startY}
           onComplete={() =>
             setHearts((prevHearts) => prevHearts.filter((h) => h.id !== heart.id))
           }
@@ -45,7 +62,7 @@ const App = () => {
   );
 }
 
-const Heart = ({ left, size, onComplete }) => {
+const Heart = ({ left, size, isInitial, startY, onComplete }) => {
   return (
     <motion.div
       className="heart"
@@ -54,16 +71,29 @@ const Heart = ({ left, size, onComplete }) => {
         width: `${size}px`,
         height: `${size}px`,
       }}
-      initial={{ y: "100vh", rotate: 0 }} // Start at the bottom
+      initial={{ y: isInitial ? `${startY}vh` : "100vh" }}
       animate={{
-        y: "-120vh", // Float to above the top of the screen
-        x: ["0%", "10%", "-10%", "5%"], // Wiggle effect
-        rotate: [0, 20, -20, 0], // Slow rotation
+        y: "-100vh",
+        x: ["0%", "10%", "-10%", "5%"],
+        rotate: [0, 20, -20, 0],
       }}
       transition={{
-        duration: 40, // Smooth float over 6 seconds
-        ease: "easeInOut",
-        repeat: 0,
+        duration: isInitial ? 6 : 12,
+        ease: "linear",
+        x: {
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut"
+        },
+        rotate: {
+          duration: 2, 
+          repeat: Infinity,
+          ease: "easeInOut"
+        },
+        y: {
+          duration: isInitial ? 6 : 12,
+          ease: "linear"
+        }
       }}
       onAnimationComplete={onComplete}
     />
