@@ -46,6 +46,21 @@ const App = () => {
 
   return (
     <div className="App">
+      <div style={{
+        position: 'absolute',
+        top: '40%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: 'white',
+        padding: '20px 40px',
+        borderRadius: '10px',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+        zIndex: 10,
+        textAlign: 'center'
+      }}>
+        <h1 style={{ fontSize: '5em', marginBottom: '-10px', marginTop: '-5px' }}>✨</h1>
+        <h2>It's Your Special Day Sushieee!</h2>
+      </div>
       {hearts.map((heart) => (
         <Heart
           key={heart.id}
