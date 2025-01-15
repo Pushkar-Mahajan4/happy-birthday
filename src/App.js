@@ -1,11 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import './App.css';
 
 const App = () => {
   const [hearts, setHearts] = useState([]);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [showButtons, setShowButtons] = useState(false);
+
+  useEffect(() => {
+    const textInterval = setInterval(() => {
+      setCurrentTextIndex(prevIndex => {
+        if (prevIndex < 2) {
+          return prevIndex + 1;
+        } else {
+          clearInterval(textInterval);
+          setShowButtons(true);
+          return prevIndex;
+        }
+      });
+    }, 8000);
+
+    return () => clearInterval(textInterval);
+  }, []);
+
   const heartCount = 4; // Number of hearts to spawn
   const spawnInterval = 2000; // Spawn rate in milliseconds
+  const messages = ["It's Your Special Day Sushieee!", "I tried to make something for you, since you are special to me!", "Do you wanna see what I made?"]; // Add your messages here
 
   useEffect(() => {
     // Create and add initial hearts one by one with a delay
@@ -56,10 +76,58 @@ const App = () => {
         borderRadius: '10px',
         boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
         zIndex: 10,
-        textAlign: 'center'
+        textAlign: 'center',
+        width: '600px',
+        height: showButtons ? '250px' : '200px'
       }}>
         <h1 style={{ fontSize: '5em', marginBottom: '-10px', marginTop: '-5px' }}>✨</h1>
-        <h2>It's Your Special Day Sushieee!</h2>
+        <AnimatePresence mode="wait">
+          <motion.h2
+            key={currentTextIndex}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+          >
+            {messages[currentTextIndex]}
+          </motion.h2>
+        </AnimatePresence>
+        {showButtons && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{ marginTop: '20px' }}
+          >
+            <button 
+              style={{
+                margin: '0 10px',
+                padding: '10px 30px',
+                fontSize: '18px',
+                borderRadius: '5px',
+                border: 'none',
+                cursor: 'pointer',
+                backgroundColor: '#e3aab7',
+                color: 'white'
+              }}
+            >
+              Yes
+            </button>
+            <button
+              style={{
+                margin: '0 10px',
+                padding: '10px 30px',
+                fontSize: '18px',
+                borderRadius: '5px',
+                border: 'none',
+                cursor: 'pointer',
+                backgroundColor: '#e3aab7',
+                color: 'white'
+              }}
+            >
+              No
+            </button>
+          </motion.div>
+        )}
       </div>
       {hearts.map((heart) => (
         <Heart
