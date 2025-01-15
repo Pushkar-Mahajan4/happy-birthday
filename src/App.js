@@ -14,11 +14,13 @@ const App = () => {
           return prevIndex + 1;
         } else {
           clearInterval(textInterval);
-          setShowButtons(true);
+          setTimeout(() => {
+            setShowButtons(true);
+          }, 0);
           return prevIndex;
         }
       });
-    }, 8000);
+    }, 8000); // Keep original 8000ms for text transitions
 
     return () => clearInterval(textInterval);
   }, []);
@@ -103,24 +105,24 @@ const App = () => {
                 margin: '0 10px',
                 padding: '10px 30px',
                 fontSize: '18px',
-                borderRadius: '5px',
+                borderRadius: '7px',
                 border: 'none',
                 cursor: 'pointer',
-                backgroundColor: '#e3aab7',
+                backgroundColor: '#C32955',
                 color: 'white'
               }}
             >
-              Yes
+              Yes!
             </button>
             <button
               style={{
                 margin: '0 10px',
                 padding: '10px 30px',
                 fontSize: '18px',
-                borderRadius: '5px',
+                borderRadius: '7px',
                 border: 'none',
                 cursor: 'pointer',
-                backgroundColor: '#e3aab7',
+                backgroundColor: '#8045D6',
                 color: 'white'
               }}
             >
