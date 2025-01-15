@@ -6,6 +6,7 @@ const App = () => {
   const [hearts, setHearts] = useState([]);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [showButtons, setShowButtons] = useState(false);
+  const [showNewScreen, setShowNewScreen] = useState(false);
 
   useEffect(() => {
     const textInterval = setInterval(() => {
@@ -13,11 +14,9 @@ const App = () => {
         if (prevIndex < 2) {
           return prevIndex + 1;
         } else {
-          clearInterval(textInterval);
-          setTimeout(() => {
+            clearInterval(textInterval);
             setShowButtons(true);
-          }, 0);
-          return prevIndex;
+            return prevIndex;
         }
       });
     }, 8000); // Keep original 8000ms for text transitions
@@ -27,10 +26,9 @@ const App = () => {
 
   const heartCount = 4; // Number of hearts to spawn
   const spawnInterval = 2000; // Spawn rate in milliseconds
-  const messages = ["It's Your Special Day Sushieee!", "I tried to make something for you, since you are special to me!", "Do you wanna see what I made?"]; // Add your messages here
+  const messages = ["It's Your Special Day Sushieee!", "I tried to make something for you, since you are special to me!", "Do you wanna see what I made?"];
 
   useEffect(() => {
-    // Create and add initial hearts one by one with a delay
     let initialHeartCount = 0;
     const initialHeartInterval = setInterval(() => {
       if (initialHeartCount < heartCount) {
@@ -64,7 +62,44 @@ const App = () => {
       clearInterval(initialHeartInterval);
       clearInterval(regularSpawnInterval);
     };
-  }, []); // Only run on mount since values are constant
+  }, []);
+
+  const handleButtonClick = () => {
+    setShowNewScreen(true);
+  };
+
+  if (showNewScreen) {
+    return (
+      <div style={{
+        backgroundColor: '#1D1C2A',
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <button
+          style={{
+            fontWeight: 'bold',
+            backgroundColor: '#1271e0',
+            padding: '15px 40px',
+            fontSize: '20px',
+            width: "450px",
+            borderRadius: '30px',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'white',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            position: 'absolute',
+            top: '25%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'
+          }}
+        >
+          Lights on
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
@@ -101,6 +136,7 @@ const App = () => {
             style={{ marginTop: '20px' }}
           >
             <button 
+              onClick={handleButtonClick}
               style={{
                 margin: '0 10px',
                 padding: '10px 30px',
@@ -115,6 +151,7 @@ const App = () => {
               Yes!
             </button>
             <button
+              onClick={handleButtonClick}
               style={{
                 margin: '0 10px',
                 padding: '10px 30px',
