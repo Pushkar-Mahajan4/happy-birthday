@@ -35,7 +35,7 @@ const App = () => {
             return prevIndex;
         }
       });
-    }, 8000); // orioginal 8000 changed to 1000 for testing
+    }, 6000); // orioginal 8000 changed to 1000 for testinghttp://localhost:3000/
 
     return () => clearInterval(textInterval);
   }, []);
@@ -143,8 +143,7 @@ const App = () => {
             left: '38%',
             transform: 'translate(-50%, -50%)',
             transformOrigin: 'center center',
-            zIndex: 2,
-            opacity: buttonDisabled ? 0.7 : 1
+            zIndex: 2
           }}
         >
           {!lightsOn ? 'Lights on' : !musicPlaying ? 'Play Music!' : buttonDisabled ? 'Wait for it :)' : 'Decorate!'}
