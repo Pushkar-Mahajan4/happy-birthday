@@ -35,7 +35,7 @@ const App = () => {
             return prevIndex;
         }
       });
-    }, 1000); // orioginal 8000 changed to 1000 for testing
+    }, 8000); // orioginal 8000 changed to 1000 for testing
 
     return () => clearInterval(textInterval);
   }, []);
