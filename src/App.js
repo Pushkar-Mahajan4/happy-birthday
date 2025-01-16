@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import './App.css';
 
@@ -10,6 +10,19 @@ const App = () => {
   const [lightsOn, setLightsOn] = useState(false);
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [showBirthdayImage, setShowBirthdayImage] = useState(false);
+  const [balloons, setBalloons] = useState([]);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio('birthday-song.mp3');
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const textInterval = setInterval(() => {
@@ -22,7 +35,7 @@ const App = () => {
             return prevIndex;
         }
       });
-    }, 8000); // Original value 8000, changed to 1000 for testing
+    }, 1000); // orioginal 8000 changed to 1000 for testing
 
     return () => clearInterval(textInterval);
   }, []);
@@ -30,6 +43,7 @@ const App = () => {
   const heartCount = 4;
   const spawnInterval = 2000;
   const messages = ["It's Your Special Day Sushieee!", "I tried to make something for you, since you are special to me!", "Do you wanna see what I made?"];
+  const balloonImages = ['red.png', 'green.png', 'pink.png', 'orange.png'];
 
   useEffect(() => {
     let initialHeartCount = 0;
@@ -66,6 +80,21 @@ const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    let balloonInterval;
+    if (showBirthdayImage) {
+      balloonInterval = setInterval(() => {
+        setBalloons(prevBalloons => [...prevBalloons, {
+          id: Date.now(),
+          left: Math.random() * 100,
+          image: balloonImages[Math.floor(Math.random() * balloonImages.length)],
+          size: Math.random() * 30 + 40,
+        }]);
+      }, 1000);
+    }
+    return () => clearInterval(balloonInterval);
+  }, [showBirthdayImage]);
+
   const handleButtonClick = () => {
     setShowNewScreen(true);
   };
@@ -75,8 +104,10 @@ const App = () => {
       setLightsOn(true);
     } else if (!musicPlaying) {
       setMusicPlaying(true);
+      audioRef.current.play();
     } else {
       setShowBirthdayImage(true);
+      setButtonDisabled(true);
     }
   };
 
@@ -87,13 +118,15 @@ const App = () => {
         minHeight: '100vh',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        overflow: 'hidden'
       }}>
         <motion.button
           onClick={handleLightsClick}
           animate={{ scale: 1 }}
           whileTap={{ scale: 1.1 }}
           initial={{ scale: 1 }}
+          disabled={buttonDisabled}
           style={{
             fontWeight: 'bold',
             backgroundColor: lightsOn ? '#C32955' : '#1271e0',
@@ -102,34 +135,71 @@ const App = () => {
             width: "450px",
             borderRadius: '30px',
             border: 'none',
-            cursor: 'pointer',
+            cursor: buttonDisabled ? 'default' : 'pointer',
             color: 'white',
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
             position: 'absolute',
             top: '20%',
             left: '38%',
             transform: 'translate(-50%, -50%)',
-            transformOrigin: 'center center'
+            transformOrigin: 'center center',
+            zIndex: 2,
+            opacity: buttonDisabled ? 0.7 : 1
           }}
         >
-          {!lightsOn ? 'Lights on' : musicPlaying ? 'Decorate' : 'Play Music!'}
+          {!lightsOn ? 'Lights on' : !musicPlaying ? 'Play Music!' : buttonDisabled ? 'Wait for it :)' : 'Decorate!'}
         </motion.button>
 
         {showBirthdayImage && (
-          <motion.img
-            src="Happy_birthday.png"
-            initial={{ y: -500, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            style={{
-              position: 'absolute',
-              top: '40%',
-              left: '37%',
-              transform: 'translate(-50%, -50%)',
-              width: '500px',
-              height: 'auto'
-            }}
-          />
+          <>
+            <motion.img
+              src="Happy_birthday.png"
+              initial={{ y: -500, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              style={{
+                position: 'absolute',
+                top: '37%',
+                left: '37%',
+                transform: 'translate(-50%, -50%)',
+                width: '500px',
+                height: 'auto',
+                zIndex: 2
+              }}
+            />
+            {balloons.map((balloon) => (
+              <motion.img
+                key={balloon.id}
+                src={balloon.image}
+                style={{
+                  position: 'absolute',
+                  left: `${balloon.left}%`,
+                  width: `${balloon.size}px`,
+                  height: 'auto',
+                  zIndex: 1
+                }}
+                initial={{ y: '100vh' }}
+                animate={{
+                  y: '-100vh',
+                  x: ['0%', '5%', '-5%', '0%']
+                }}
+                transition={{
+                  duration: 15,
+                  ease: 'linear',
+                  x: {
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  }
+                }}
+                onAnimationComplete={() => {
+                  setBalloons(prevBalloons => 
+                    prevBalloons.filter(b => b.id !== balloon.id)
+                  );
+                }}
+              />
+            ))}
+          </>
         )}
       </div>
     );
