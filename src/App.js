@@ -7,6 +7,9 @@ const App = () => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [showButtons, setShowButtons] = useState(false);
   const [showNewScreen, setShowNewScreen] = useState(false);
+  const [lightsOn, setLightsOn] = useState(false);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const [showBirthdayImage, setShowBirthdayImage] = useState(false);
 
   useEffect(() => {
     const textInterval = setInterval(() => {
@@ -19,13 +22,13 @@ const App = () => {
             return prevIndex;
         }
       });
-    }, 8000); // Keep original 8000ms for text transitions
+    }, 8000); // Original value 8000, changed to 1000 for testing
 
     return () => clearInterval(textInterval);
   }, []);
 
-  const heartCount = 4; // Number of hearts to spawn
-  const spawnInterval = 2000; // Spawn rate in milliseconds
+  const heartCount = 4;
+  const spawnInterval = 2000;
   const messages = ["It's Your Special Day Sushieee!", "I tried to make something for you, since you are special to me!", "Do you wanna see what I made?"];
 
   useEffect(() => {
@@ -36,16 +39,15 @@ const App = () => {
           id: Math.random(),
           left: Math.random() * 100,
           size: Math.random() * 20 + 20,
-          startY: 60 + (initialHeartCount * 10), // Space hearts vertically from 60vh
+          startY: 60 + (initialHeartCount * 10),
           isInitial: true,
         }]);
         initialHeartCount++;
       } else {
         clearInterval(initialHeartInterval);
       }
-    }, 500); // Add a new initial heart every 500ms
+    }, 500);
 
-    // Start regular heart spawning after initial hearts are created
     const regularSpawnInterval = setInterval(() => {
       setHearts((prevHearts) => [
         ...prevHearts,
@@ -68,19 +70,33 @@ const App = () => {
     setShowNewScreen(true);
   };
 
+  const handleLightsClick = () => {
+    if (!lightsOn) {
+      setLightsOn(true);
+    } else if (!musicPlaying) {
+      setMusicPlaying(true);
+    } else {
+      setShowBirthdayImage(true);
+    }
+  };
+
   if (showNewScreen) {
     return (
       <div style={{
-        backgroundColor: '#1D1C2A',
+        backgroundColor: lightsOn ? '#e4c4cc' : '#1D1C2A',
         minHeight: '100vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
       }}>
-        <button
+        <motion.button
+          onClick={handleLightsClick}
+          animate={{ scale: 1 }}
+          whileTap={{ scale: 1.1 }}
+          initial={{ scale: 1 }}
           style={{
             fontWeight: 'bold',
-            backgroundColor: '#1271e0',
+            backgroundColor: lightsOn ? '#C32955' : '#1271e0',
             padding: '15px 40px',
             fontSize: '20px',
             width: "450px",
@@ -90,13 +106,31 @@ const App = () => {
             color: 'white',
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
             position: 'absolute',
-            top: '25%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)'
+            top: '20%',
+            left: '38%',
+            transform: 'translate(-50%, -50%)',
+            transformOrigin: 'center center'
           }}
         >
-          Lights on
-        </button>
+          {!lightsOn ? 'Lights on' : musicPlaying ? 'Decorate' : 'Play Music!'}
+        </motion.button>
+
+        {showBirthdayImage && (
+          <motion.img
+            src="Happy_birthday.png"
+            initial={{ y: -500, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            style={{
+              position: 'absolute',
+              top: '40%',
+              left: '37%',
+              transform: 'translate(-50%, -50%)',
+              width: '500px',
+              height: 'auto'
+            }}
+          />
+        )}
       </div>
     );
   }
